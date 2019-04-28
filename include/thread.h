@@ -9,6 +9,7 @@
 #include <memory>
 #include <thread>
 #include <mutex>
+#include <shared_mutex>
 #include <condition_variable>
 #include <future>
 #include <functional>
@@ -60,6 +61,17 @@ class ThreadPool {
   std::mutex queue_mutex;
   std::condition_variable condition;
   bool stop;
+};
+
+class Counter {
+ private:
+  mutable std::shared_timed_mutex mutex;
+  int cnt;
+ public:
+  Counter();
+  int get() const;
+  void increase();
+  void reset();
 };
 
 #endif //REVIEW_THREAD_H

@@ -61,8 +61,9 @@ void test_search() {
 }
 
 void test_thread() {
+  /*
   {
-//    mutex_blocking();
+    mutex_blocking();
   }
   {
     auto f = [] {
@@ -73,6 +74,25 @@ void test_thread() {
     for (int i = 0; i < 10; i++) {
       pool.enqueue(f);
     }
+  }
+   */
+  {
+    Counter counter;
+    std::mutex outMutex;
+    auto loop = [&] {
+      for (int i = 0; i < 3; i++) {
+        counter.increase();
+        int cnt = counter.get();
+        std::unique_lock<std::mutex> lock(outMutex);
+        printf("thread %lu: %d\n",
+            std::hash<std::thread::id>{}(std::this_thread::get_id()),
+            cnt);
+      }
+    };
+    std::thread firstThread(loop), secondThread(loop);
+    counter.reset();
+    firstThread.join();
+    secondThread.join();
   }
 }
 
